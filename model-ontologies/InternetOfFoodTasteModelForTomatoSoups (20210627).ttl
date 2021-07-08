@@ -1,0 +1,348 @@
+@prefix : <http://www.foodvoc.org/resource/InternetOfFood/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix inof: <http://www.foodvoc.org/resource/InternetOfFood/> .
+@prefix table: <http://www.foodvoc.org/resource/InternetOfFood/Table> .
+@prefix service: <http://www.foodvoc.org/resource/InternetOfFood/Service> .
+@prefix tmfts: <http://www.foodvoc.org/resource/InternetOfFood/TasteModelForTomatoSoups> .
+
+
+
+@prefix om: <http://www.ontology-of-units-of-measure.org/resource/om-2/> .
+@prefix omx: <http://www.foodvoc.org/resource/InternetOfFood/> .     # OM extension
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix owl2: <http://www.w3.org/2006/12/owl2#> .
+@prefix owl3: <http://www.foodvoc.org/resource/InternetOfFood/> .    # Imaginary Owl version (does not exist)
+@prefix prov: <http://www.w3.org/ns/prov/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix foodon: <http://purl.org/heals/foodon/> .
+
+# Change http adresses of inof:, table:, service:, and tmfts: to urn's? If so, use rdfs:isDefinedBy.
+
+tmfts:
+  a owl:Ontology ;
+#  rdfs:isDefinedBy
+#    <http://www.w3.org/TR/owl2-mapping-to-rdf/>,      # Voorbeeld; uit de ontologie van Owl zelf.
+#    <http://www.w3.org/TR/owl2-rdf-based-semantics/>, # Voorbeeld; uit de ontologie van Owl zelf.
+#    <http://www.w3.org/TR/owl2-syntax/> ;             # Voorbeeld; uit de ontologie van Owl zelf.
+  owl:imports <http://www.w3.org/2004/02/skos/core> ;
+# De andere ontologieën die we met de prefixes aangeven ook importeren? Dit zouden dan wel echt http's zijn.
+.
+
+# Taste Model For Tomato Soups (tmfts)
+
+# Stored in tmfts:
+
+tmfts:SensoryAttribute
+  a owl:Class ;
+  rdfs:label "sensory attribute"@en ;
+  rdfs:subClassOf om:Quantity ;
+.
+
+tmfts:Sweetness
+  a owl:Class ;
+  rdfs:subclassOf tmfts:SensoryAttribute ;
+  om:hasUnit om:_0-100 ;
+.
+
+tmfts:Sourness
+  a owl:Class ;
+  rdfs:subclassOf tmfts:SensoryAttribute ;
+  om:hasUnit om:_0-100 ;
+.
+
+tmfts:Saltiness
+  a owl:Class ;
+  rdfs:subclassOf tmfts:SensoryAttribute ;
+  om:hasUnit om:_0-100 ;
+.
+
+tmfts:TomatoFlavour
+  a owl:Class ;
+  rdfs:subclassOf tmfts:SensoryAttribute ;
+  om:hasUnit om:_0-100 ;
+.
+
+
+
+
+tmfts:IngredientSchema
+  a table:DataSchemaClass ;
+  table:hasColumnProperty tmfts:ing_ingredient, 
+                          tmfts:ing_ingredientCode,
+                          tmfts:ing_value,
+                          tmfts:ing_unitOfMeasure
+.
+
+tmfts:ing_ingredient
+  a table:ColumnProperty ;
+  rdfs:domain tmfts:IngredientSchema ;
+  rdfs:range xsd:string ;
+  table:hasColumnName "Ingredient" ;
+.
+
+tmfts:ing_ingredientCode
+  a table:ColumnProperty ;
+  rdfs:domain tmfts:IngredientSchema ;
+  rdfs:range xsd:integer ;
+  table:hasColumnName "IngredientCode" ;
+.
+
+tmfts:ing_value
+  a table:ColumnProperty ;
+  rdfs:domain tmfts:IngredientSchema ;
+  rdfs:range xsd:integer ;
+  table:hasColumnName "Value" ;
+.
+
+tmfts:ing_unitOfMeasure
+  a table:ColumnProperty ;
+  rdfs:domain tmfts:IngredientSchema ;
+  rdfs:range xsd:string ;
+  table:hasColumnName "UnitOfMeasure" ;
+.
+
+
+tmfts:ingredient
+  a table:InterfaceObjectProperty ;
+  rdfs:domain tmfts:IngredientSchema ;
+  rdfs:range foodon:FoodMaterial ;
+.
+
+#tmfts:ingredientCode
+#  a table:InterfaceObjectProperty ;
+#  rdfs:domain tmfts:IngredientSchema ;
+#  rdfs:range foodon:FoodMaterial ;
+#.
+
+tmfts:ingredientValue
+  a table:InterfaceDatatypeProperty ;
+  rdfs:domain tmfts:IngredientSchema ;
+  rdfs:range xsd:integer ;
+.
+
+tmfts:ingredientUnitOfMeasure
+  a table:InterfaceObjectProperty ;
+  rdfs:domain tmfts:IngredientSchema ;
+  rdfs:range om:Unit ;
+.
+
+tmfts:ingredientAmount
+#  a table:InterfaceObjectProperty, 
+  a table:InterfaceObjectProperty ;
+#  owl:ObjectProperty, owl:FunctionalProperty; # Niet nodig denk ik; doen we bij de andere interface properties ook niet.
+  rdfs:domain tmfts:IngredientSchema ;
+  rdfs:range om:Quantity ;
+.
+
+#[om:quantityUnitProductProperty (
+#  tmfts:ingredientValue
+##  [owl2:objectPropertyChain (tmfts:ingredientUnitOfMeasure [owl:inverseProperty rdfs:label])]
+#  [owl2:objectPropertyChain (tmfts:ingredientUnitOfMeasure [owl:inverseProperty om:hasSymbol])]
+#  )] rdfs:subPropertyOf tmfts:ingredientAmount
+#.
+
+#omvormen: niet verwijzen naar object properties voor value en unit of measure, maar naar de column properties.
+
+#[om:quantityUnitProductProperty (
+#  tmfts:ing_value
+##  [owl2:objectPropertyChain (tmfts:ing_unitOfMeasure [owl:inverseProperty rdfs:label])]
+#  [owl2:objectPropertyChain (tmfts:ing_unitOfMeasure [owl:inverseProperty om:hasSymbol])]
+#  )] rdfs:subPropertyOf tmfts:ingredientAmount
+#.
+
+#Bovenstaande omvormen tot:
+#om:hasValue [ a om:Measure;
+#  om:hasNumericalValue 123.4;
+#  om:hasUnit om:kg]
+#.
+
+tmfts:ingredientAmount
+  omx:isQuantityPropertyOf
+#    [omx:numericalValueProperty tmfts:ingredientValue ;
+#    [omx:hasNumericalValueProperty tmfts:ingredientValue ;
+    [omx:hasNumericalValueProperty tmfts:ing_value ;
+#     omx:unitNameProperty tmfts:ingredientUnitOfMeasure]
+#     omx:hasUnitProperty tmfts:ingredientUnitOfMeasure]
+     omx:hasUnitProperty tmfts:ing_unitOfMeasure]
+.
+
+
+#[owl2:objectPropertyChain
+#  (
+#    tmfts:ing_ingredient
+#    [owl:inversePropertyOf skos:prefLabel]
+#  )
+#]
+#  owl2:subObjectPropertyOf tmfts:ingredient
+#.
+
+# Hebben we onderstaande wel nodig als owl3:dataTypePropertyChain niet bestaat en we dus genoodzaakt te zijn te werken met een query (gegeven in commentvorm hieronder)?
+
+#tmfts:ingredient_Ingredient   # Waar gebruiken we dit property? Wordt verder in de hele file niet naar gerefereerd.
+tmfts:ing_ingredient
+  owl3:dataTypePropertyChain(
+                tmfts:ingredient
+#                skos:prefLabel
+                rdfs:Label       # FoodOn uses rdfs:label, not skos:prefLabel
+                )
+.
+
+#?row a my:ingredient ?ingredient.
+#
+#iff
+#
+#SELECT ?row ?ingredient WHERE{
+#?row a my:IngredientTable;
+#                my:ingredient ?ingredient;
+#                my:ingredient_Ingredient ?ingredientname.
+#
+#?ingredient skos:prefLabel ?ingredientname.
+
+# Hebben we onderstaande wel nodig als owl3:dataTypePropertyChain niet bestaat en we dus genoodzaakt te zijn te werken met een query (gegeven in commentvorm hieronder)?
+
+#tmfts:ingredient_Hoeveelheid
+tmfts:ing_value
+  owl3:dataTypePropertyChain(
+                tmfts:ingredientAmount 
+                om:hasValue                       # synonym omx:hasMeasure
+              om:hasNumericalValue
+             )
+.
+
+#tmfts:ingredient_Unit
+tmfts:ing_unitOfMeasure
+  owl3:dataTypePropertyChain(
+                tmfts:ingredientAmount
+                om:hasValue                      # synonym omx:hasMeasure
+              om:hasUnit
+              rdfs:label                            # beter omx:hasUnitName
+)                            
+.
+
+#?row tmfts:ingredientAmount ?amount.
+#
+#iff
+#
+#SELECT ?row ?amount WHERE{
+#?row a tmfts:IngredientSchema;
+#                tmfts:ingredientAmount ?amount;
+#                tmfts:ingredientUnitOfMeasure ?unitname;
+#                tmfts:ingredientValue ?hoev.
+#
+#?amount om:hasValue ?meas.
+#?meas om:hasUnit ?unit;
+#             om:hasNumericalValue ?hoev.
+#?unit rdfs:label ?unitname.
+#}
+
+
+
+
+
+
+#Zodra we op hasUnitName overstappen:
+#[ a rdfs:Class;
+#     owl:intersectionOf(
+#          owl:DataTypeProperty
+#          [a owl:Restriction;
+#                    owl:onProperty rdfs:subProperty;
+#                    owl:toValue rdfs:label]
+#          [a owl:Restriction;
+#                    owl:onProperty rdfs:domain;
+#                    owl:toValue om:Unit]
+#          )
+#] 
+#rdfs:subClassOf 
+# [a rdfs:Class;
+#     owl:intersectionOf(
+#          owl:DataTypeProperty
+#          [a owl:Restriction;
+#                    owl:onProperty rdfs:subProperty;
+#                    owl:toValue omx:hasUnitName]
+#      )
+#]
+#.
+
+
+tmfts:taste_property
+  a table:ColumnProperty ;
+  rdfs:domain tmfts:TasteSchema ;
+  rdfs:range xsd:string ;
+  table:hasColumnName "Property" ;
+.
+
+tmfts:taste_value
+  a table:ColumnProperty ;
+  rdfs:domain tmfts:TasteSchema ;
+  rdfs:range xsd:float ;
+  table:hasColumnName "Value" ;
+.
+
+tmfts:taste_unitOfMeasure
+  a table:ColumnProperty ;
+  rdfs:domain tmfts:TasteSchema ;
+  rdfs:range xsd:string ;
+  table:hasColumnName "UnitOfMeasure" ;
+.
+
+tmfts:TasteSchema
+  a table:DataSchemaClass ;
+  table:hasColumnProperty tmfts:taste_property, 
+                          tmfts:taste_value,
+                          tmfts:taste_unitOfMeasure
+.
+
+#tmfts:property
+tmfts:tasteProperty
+  a table:InterfaceObjectProperty ;
+  rdfs:domain tmfts:TasteSchema ;
+  rdfs:range tmfts:SensoryAttribute ;
+.
+
+tmfts:tasteValue
+  a table:InterfaceDatatypeProperty ;
+  rdfs:domain tmfts:TasteSchema ;
+  rdfs:range xsd:float ;
+.
+
+tmfts:tasteUnitOfMeasure
+  a table:InterfaceObjectProperty ;
+  rdfs:domain tmfts:TasteSchema ;
+  rdfs:range om:Unit ;
+.
+
+
+
+
+#tmfts:input__ingredient_schema
+tmfts:argument__ingredient_schema
+#  a service:InputArgument ;
+  a service:Argument ;
+  service:hasArgumentName "ingredient_schema" ;
+  service:hasArgumentSchema tmfts:IngredientSchema ;
+.
+
+#tmfts:output__taste_schema
+tmfts:argument__taste_schema
+#  a service:OutputArgument ;
+  a service:Argument ;
+  service:hasArgumentName "taste_schema" ;
+  service:hasArgumentSchema tmfts:TasteSchema ;
+.
+
+tmfts:SoupModel
+  a service:Service ;
+  service:hasInputArgument tmfts:argument__ingredient_schema ;
+  service:hasOutputArgument tmfts:argument__taste_schema ;
+##  service:hasInterfaceObjectProperty tmfts:ingredient, tmfts:ingredientCode, tmfts:ingredientUnitOfMeasure ; # ingredients
+#  service:hasInterfaceObjectProperty tmfts:ingredient, tmfts:ingredientAmount ; # ingredients
+##  service:hasInterfaceDatatypeProperty tmfts:ingredientValue ; # ingredients
+#  service:hasInterfaceObjectProperty tmfts:tasteProperty, tmfts:tasteUnitOfMeasure ; # taste
+#  service:hasInterfaceDatatypeProperty tmfts:tasteValue ; #taste
+.
+
+
+

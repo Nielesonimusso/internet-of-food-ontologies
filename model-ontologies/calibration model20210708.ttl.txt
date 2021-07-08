@@ -1,0 +1,255 @@
+
+@prefix calm: urn://Drops-R-US:XYZ-12345:
+
+xxx:ElectroMagneticRadiation a om:PhysicalPhenomenon;
+	om:hasCharacteristic xxx:wavelength;
+	dct:description 
+"Electromagnetic radiation is a wave phenomenon caused by varying electric and magnetic fields propagating with the speed of light (in vacuum). EM radiation of different wavelength encompasses phenomena such as radiowaves, microwaves, infrared, ultra violet, X-rays, and gamma radiation".
+	rdf:label "EM radiation".
+
+xxx:InfraRedLight rdfs:subClassOf xxx:ElectronMagneticRadiation;
+	dct:description
+"Infrared light is electromagnetic radiation with a wavelength between the 700nm (deep visible red) to 1 mm".
+ 
+xxx:wavelength rdf:subClassOf om:length;
+	dct:description 
+"the wavelength of a wave is the length of one period of the wave".
+
+calm:dropletsize rdfs:subClassOf om:Length.
+	dct:description 
+"the mean droplet size of a suspension to be measured by the 
+Drops-R-US XYZ12345 NIR spectrometre.
+ 
+calm:Log10Attenuation rdfs:subClassOf om:QuantityOfDimensionOne;
+	dct:description
+"The log (base 10) attenuation of the NIR light passed trough the suspension in the DropsRUS XYZ123456 NIR spectrometre".
+
+#One on the log10(Attenuation) scale
+calm:db a calm:Log10Attenuation. 
+
+#XXXXXXX This is one for Hajo:
+calm:Log10AttenuationPerLog10LengthRatio rdfs:subClassOf om:QuantityOfDimensionOne.
+
+#one on the log10(Attenuation) scale per one on the log10(length ration)
+calm:dbperdb a calm:Log10AttenuationPerLog10LengthRatio.
+
+calm:CalibrationSchema a table:DataSchemaClass
+	table:hasColumnProperty  calm:calibration_dropletSize,
+				calm:calibration_wavelength,
+				calm:calibration_log10Attenuation.
+
+calm:calibration_dropletSize a table:ColumnProperty,
+                                owl:DatatypeProperty, owl:FunctionalProperty;
+	rdfs:domain calm:CalibrationSchema;
+	rdfs:range xsd:double;
+	table:hasColumnName "Droplet size (µm)".
+
+calm:calibration_wavelength a a table:ColumnProperty,
+                        owl:DatatypeProperty, owl:FunctionalProperty;
+	rdfs:domain calm:CalibrationSchema;
+	rdfs:range xsd:double;
+	table:hasColumnName "Lambda (nm)".
+
+calm:calibration_log10Attenuation a a table:ColumnProperty,
+                        owl:DatatypeProperty, owl:FunctionalProperty;
+	rdfs:domain calm:CalibrationSchema;
+	rdfs:range xsd:double;
+	table:hasColumnName "Log10(Attenuation)".
+
+calm:calibrationDropletSize a table:InterfaceProperty,
+                      owl:ObjectProperty, owl:FunctionalProperty;
+	rdfs:domain calm:CalibrationSchema;
+	rdfs:range om:Length;
+	omx:isQuantityPropertyOf 
+		[omx:hasNumericalValueProperty calm:calibration_dropletSize;
+		 omx:hasFixedUnit om:micrometre].
+
+calm:calibrationWavelengh a table:InterfaceProperty,
+                      owl:ObjectProperty, owl:FunctionalProperty;
+	rdfs:domain calm:CalibrationSchema;
+	rdfs:range om:Length;
+	omx:isQuantityPropertyOf 
+		[omx:hasNumericalValueProperty calm:calibration_Wavelength;
+		 omx:hasFixedUnit om:nanometre].
+
+
+#maybe this is overdoing it and we should leave true numerical properties
+
+calm:calibrationLog10Attenuation a table:InterfaceProperty,
+                      owl:ObjectProperty, owl:FunctionalProperty;
+	rdfs:domain calm:CalibrationSchema;
+	rdfs:range calm:Log10Attenuation;
+	omx:isQuantityPropertyOf 
+		[omx:hasNumericalValueProperty calm:calibration_Log10Attenuation;
+		 omx:hasFixedUnit om:db].
+
+calm:AttenuationCurveCoefficientsSchema a table:DataSchemaClass;
+	table:hasColumnProperty calm:accoeff_wavelength,
+				calm:accoeff_alpha,
+				calm:accoeff_beta,
+				calm:accoeff_stddev_beta.
+
+calm:accoeff_wavelength a table:ColumnProperty,
+                          owl:DatatypeProperty, owl:FunctionalProperty;
+	rdfs:domain calm:AttenuationCurveCoefficients;
+	rdfs:range xsd:double;
+	table:hasColumnName "Lambda (nm)".
+
+calm:accoeff_alpha a table:ColumnProperty,
+                     owl:DatatypeProperty, owl:FunctionalProperty;
+	rdfs:domain calm:AttenuationCurveCoefficients;
+	rdfs:range xsd:double;
+	table:hasColumnName "alpha".
+
+calm:accoeff_beta a table:ColumnProperty,
+                    owl:DatatypeProperty, owl:FunctionalProperty;
+	rdfs:domain calm:AttenuationCurveCoefficients;
+	rdfs:range xsd:double;
+	table:hasColumnName "beta".
+
+calm:accoeff_stddev_beta a table:ColumnProperty,
+                    owl:DatatypeProperty, owl:FunctionalProperty;
+	rdfs:domain calm:AttenuationCurveCoefficients;
+	rdfs:range xsd:double;
+	table:hasColumnName "stddev_beta".
+
+calm:accoeffWavelengh a table:InterfaceProperty,
+                      owl:ObjectProperty, owl:FunctionalProperty;
+	rdfs:domain calm:AttenuationCurveCoefficients;;
+	rdfs:range om:Length;
+	omx:isQuantityPropertyOf 
+		[omx:hasNumericalValueProperty calm:accoeff_wavelength;
+		 omx:hasFixedUnit om:nanometre].
+
+calm:accoeffAlpha a table:ColumnProperty,
+                     owl:ObjectProperty, owl:FunctionalProperty;
+	rdfs:domain calm:AttenuationCurveCoefficients;
+	rdfs:range calm:Log10Attenuation.
+	omx:isQuantityPropertyOf 
+		[omx:hasNumericalValueProperty calm:accoeff_alpha;
+		 omx:hasFixedUnit calm:db]. #XXXXXX!!!!
+
+
+calm:accoeffBeta a table:ColumnProperty,
+                     owl:ObjectProperty, owl:FunctionalProperty;
+	rdfs:domain calm:AttenuationCurveCoefficients;
+	rdfs:range calm:Log10AttenuationPerWavelength.
+	omx:isQuantityPropertyOf 
+		[omx:hasNumericalValueProperty calm:accoeff_alpha;
+		 omx:hasFixedUnit calm:dbperdb]. #XXXXXX!!!!
+
+
+calm:accoeffStdDevBeta a table:ColumnProperty,
+                     owl:ObjectProperty, owl:FunctionalProperty;
+	rdfs:domain calm:AttenuationCurveCoefficients;
+	rdfs:range calm:Log10AttenuationPerWavelength.
+	omx:isQuantityPropertyOf 
+		[omx:hasNumericalValueProperty calm:accoeff_alpha;
+		 omx:hasFixedUnit calm:dbperdb].
+
+
+
+calm:DropSizeSchema a table:DataSchemaClass;
+	table:hasColumnProperty calm:dropsize_dropSize.
+
+calm:dropsize_dropSize a table:ColumnProperty,
+                           owl:DatatypeProperty, owl:FunctionalProperty;
+	rdfs:domain calm:DropSizeSchema;
+	rdfs:range xsd:double;
+	table:hasColumnName "Droplet size (µm)".
+ 
+calm:dropsizeDropSize a table:InterfaceProperty,
+                      owl:ObjectProperty, owl:FunctionalProperty;
+	rdfs:domain calm:DropSizeSchema;
+	rdfs:range om:Length;
+	omx:isQuantityPropertyOf 
+		[omx:hasNumericalValueProperty calm:dropsize_dropSize;
+		 omx:hasFixedUnit om:micrometre].
+
+
+calm:dropsizeCalibrationModel a service:Model;
+	calm:hasInputArgument calm:input_CalibrationData;
+	calm:hasOutputArgument calm:output_AttenuationCurveCoeffcients,
+			      calm:output_GeometricMeanDropsize;
+	dct:description 
+"service that computes the attenuation curve coefficients over  a range of Near InfraRed wavelengths, from the Mie attenuation curve(s) of  log10 attenuation vs wavelength for different droplet sizes
+For the Drops-R-US XYZ123456 NIR spectrometre see 
+Rogier Brussee (2021): From NIR spectrometry to particle size V2.
+Rick Sanchez C-137 (2121), the Drops-R-US XYZ123456 NIR spectrometre, Adult Swim".
+
+calm:input_CalibrationData a service:Argument;
+	service:hasArgumentName "calibration_data";
+	service:hasArgumentSchema calm:CalibrationSchema.
+
+calm:output_AttenuationCurveCoeffcients a service:Argument;
+	service:hasArgumentName "attenuation_curve_coefficients";
+	service:hasArgumentSchema calm:AttenuationCurveCoefficientsSchema.
+
+calm:output_GeometricMeanDropSize a service:Argument;
+	service:hasArgumentName "geometric_mean_droplet_size_micron";
+	service:hasArgumentSchema calm:DropSizeSchema.
+
+calm:MeasurementSchema a table:DataSchemaClass
+	table:hasColumnProperty 
+	calm:measurement_wavelength,
+	calm:measurement_log10Attenuation.
+
+calm:measurement_wavelength a a table:ColumnProperty,
+                        owl:DatatypeProperty, owl:FunctionalProperty;
+	refs:domain calm:MeasurementSchema;
+	rdfs:range xsd:double;
+	table:hasColumnName "Lambda (nm)".
+
+calm:measurement_log10Attenuation a a table:ColumnProperty,
+                        owl:DatatypeProperty, owl:FunctionalProperty;
+	rdfs:domain calm:MeasurementSchema;
+	rdfs:range xsd:double;
+	table:hasColumnName "Log10(Attenuation)".
+
+
+
+calm:measurementWavelength a a table:InterfaceProperty,
+                        owl:ObjectProperty, owl:FunctionalProperty;
+	refs:domain calm:MeasurementSchema;
+	rdfs:range om:Length;
+	omx:isQuantityPropertyOf 
+		[omx:hasNumericalValueProperty calm:measurement_wavelength;
+		 omx:hasFixedUnit om:nanometre].
+
+
+calm:measurementLog10Attenuation a a table:InterfaceProperty,
+                        owl:ObjectProperty, owl:FunctionalProperty;
+	rdfs:domain calm:MeasurementSchema;
+	rdfs:range calm:Log10Attenuation;
+	omx:isQuantityPropertyOf 
+		[omx:hasNumericalValueProperty calm:measurement_log10Attenuation;
+		 omx:hasFixedUnit omx:hasFixedUnit calm:db].
+
+
+calm:dropsizeMeasurementModel a service:Model;
+	calm:hasInputArgument calm:input_AttenuationCurveCoefficients,
+			     calm:input_GeometricMeanCalibrationDropsize,
+                               calm:input_MeasurementData.
+	calm:hasOutputArgument calm:output_Dropsize.
+
+
+calm:input_AttenuationCurveCoefficients a service:Argument;
+	service:hasArgumentName "attenuation_curve_coefficients";
+	service:hasArgumentSchema calm:AttenuationCurveCoefficientsSchema.
+
+calm:input_GeometricMeanCalibrationDropsize a service:Argument;
+	service:hasArgumentName "geometric_mean_calibration_dropsize";
+	service:hasArgumentSchema calm:DropSizeSchema.
+
+calm:input_MeasurementData a service:Argument;
+	service:hasArgumentName "measurement_data";
+	service:hasArgumentSchema calm:MeasurementSchema.
+
+
+calm:output_Dropsize a service:Argument;
+	service:hasArgumentName "drop_size";
+	service:hasArgumentSchema calm:DropSizeSchema.
+	
+
+
+

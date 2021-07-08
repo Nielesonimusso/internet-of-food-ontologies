@@ -1,0 +1,844 @@
+@prefix : <http://www.foodvoc.org/resource/InternetOfFood/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix inof: <http://www.foodvoc.org/resource/InternetOfFood/> .
+@prefix table: <http://www.foodvoc.org/resource/InternetOfFood/Table> .
+@prefix service: <http://www.foodvoc.org/resource/InternetOfFood/Service> .
+
+
+@prefix nizom: <http://www.foodvoc.org/resource/InternetOfFood/NIZOModels> .
+
+@prefix om: <http://www.ontology-of-units-of-measure.org/resource/om-2/> .
+@prefix omx: <http://www.foodvoc.org/resource/InternetOfFood/> .     # OM extension
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix owl2: <http://www.w3.org/2006/12/owl2#> .
+@prefix owl3: <http://www.foodvoc.org/resource/InternetOfFood/> .    # Imaginary Owl version (does not exist)
+@prefix prov: <http://www.w3.org/ns/prov/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+@prefix obo: <http://purl.obolibrary.org/obo/> .
+# Change http adresses of inof:, table:, service:, and tmfts: to urn's? If so, use rdfs:isDefinedBy.
+
+nizom:
+  a owl:Ontology ;
+#  rdfs:isDefinedBy
+#    <http://www.w3.org/TR/owl2-mapping-to-rdf/>,      # Voorbeeld; uit de ontologie van Owl zelf.
+#    <http://www.w3.org/TR/owl2-rdf-based-semantics/>, # Voorbeeld; uit de ontologie van Owl zelf.
+#    <http://www.w3.org/TR/owl2-syntax/> ;             # Voorbeeld; uit de ontologie van Owl zelf.
+  owl:imports <http://www.w3.org/2004/02/skos/core> ;
+# De andere ontologieën die we met de prefixes aangeven ook importeren? Dit zouden dan wel echt http's zijn.
+.
+
+# NIZO Models (nizom)
+
+# Stored in Nizom:
+
+nizom:HEX
+  a owl:Class ;
+  rdfs:label "HEX"@en ;
+.
+
+nizom:HeatingSection1
+  a owl:Class ;
+  rdfs:label "heating section 1"@en ;
+  rdfs:subclassOf nizom:HEX ;
+.
+
+nizom:HeatingSection2
+  a owl:Class ;
+  rdfs:label "heating section 2"@en ;
+  rdfs:subclassOf nizom:HEX ;
+.
+
+nizom:Type
+  a owl:Class ;
+  rdfs:label "type"@en ;
+.
+
+nizom:None
+  a owl:Class ;
+  rdfs:label "none"@en ;
+  rdfs:subclassOf nizom:Type ;
+.
+
+
+nizom:ProductStreamDefinitionSchema
+  a table:DataSchemaClass ;
+  table:hasColumnProperty nizom:psd_property,
+                          nizom:psd_value,
+                          nizom:psd_unitOfMeasure
+.
+
+nizom:psd_property
+  a table:ColumnProperty ;
+  rdfs:domain nizom:ProductStreamDefinitionSchema ;
+  rdfs:range xsd:string ;
+  table:hasColumnName "Property" ;
+.
+
+nizom:psd_value
+  a table:ColumnProperty ;
+  rdfs:domain nizom:ProductStreamDefinitionSchema ;
+  rdfs:range xsd:integer ;
+  table:hasColumnName "Value" ;
+.
+
+nizom:psd_unitOfMeasure
+  a table:ColumnProperty ;
+  rdfs:domain nizom:ProductStreamDefinitionSchema ;
+  rdfs:range xsd:string ;
+  table:hasColumnName "UnitOfMeasure" ;
+.
+
+nizom:productStreamDefinitionProperty
+  a table:InterfaceObjectProperty ;
+  rdfs:domain nizom:ProductStreamDefinitionSchema ;
+  rdfs:range om:Quantity ;
+.
+
+nizom:productStreamDefinitionValue
+  a table:InterfaceDatatypeProperty ;
+  rdfs:domain nizom:ProductStreamDefinitionSchema ;
+  rdfs:range xsd:integer ;
+.
+
+nizom:productStreamDefinitionUnitOfMeasure
+  a table:InterfaceObjectProperty ;
+  rdfs:domain nizom:ProductStreamDefinitionSchema ;
+  rdfs:range om:Unit ;
+.
+
+nizom:productStreamDefinitionAmount
+  a table:InterfaceObjectProperty ;
+  rdfs:domain nizom:ProductStreamDefinitionSchema ;
+  rdfs:range om:Quantity ;
+.
+
+nizom:productStreamDefinitionAmount
+  omx:isQuantityPropertyOf
+    [omx:hasNumericalValueProperty nizom:psd_value ;
+     omx:hasUnitProperty nizom:psd_unitOfMeasure]
+.
+
+
+nizom:psd_property
+  owl3:dataTypePropertyChain(
+                nizom:productStreamDefinitionProperty
+#                skos:prefLabel
+                rdfs:label
+                )
+.
+
+nizom:psd_value
+  owl3:dataTypePropertyChain(
+                nizom:productStreamDefinitionAmount 
+                om:hasValue                       # synonym omx:hasMeasure
+              om:hasNumericalValue
+             )
+.
+
+nizom:psd_unitOfMeasure
+  owl3:dataTypePropertyChain(
+                nizom:productStreamDefinitionAmount
+                om:hasValue                      # synonym omx:hasMeasure
+              om:hasUnit
+              rdfs:label                            # beter omx:hasUnitName
+)                            
+.
+
+
+
+nizom:PasteurizationDefinitionSchema
+  a table:DataSchemaClass ;
+  table:hasColumnProperty nizom:pd_HEX, 
+                          nizom:pd_type,
+                          nizom:pd_outletTemperature,
+                          nizom:pd_unitOfMeasure
+.
+
+nizom:pd_HEX
+  a table:ColumnProperty ;
+  rdfs:domain nizom:PasteurizationDefinitionSchema ;
+  rdfs:range xsd:string ;
+  table:hasColumnName "HEX" ;
+.
+
+nizom:pd_type
+  a table:ColumnProperty ;
+  rdfs:domain nizom:PasteurizationDefinitionSchema ;
+  rdfs:range xsd:string ;
+  table:hasColumnName "Type" ;
+.
+
+nizom:pd_outletTemperature
+  a table:ColumnProperty ;
+  rdfs:domain nizom:PasteurizationDefinitionSchema ;
+  rdfs:range xsd:integer ;
+  table:hasColumnName "Outlet temperature" ;
+.
+
+nizom:pd_unitOfMeasure
+  a table:ColumnProperty ;
+  rdfs:domain nizom:PasteurizationDefinitionSchema ;
+  rdfs:range xsd:string ;
+  table:hasColumnName "Unit" ;
+.
+
+
+nizom:pasteurizationDefinitionHEX
+  a table:InterfaceObjectProperty ;
+  rdfs:domain nizom:PasteurizationDefinitionSchema ;
+  rdfs:range nizom:HEX ;
+.
+
+nizom:pasteurizationDefinitionType
+  a table:InterfaceDatatypeProperty ;
+  rdfs:domain nizom:PasteurizationDefinitionSchema ;
+  rdfs:range nizom:Type ;
+.
+
+nizom:pasteurizationDefinitionOutletTemperature
+#  a table:InterfaceObjectProperty ;
+  a table:InterfaceDatatypeProperty ;
+  rdfs:domain nizom:PasteurizationDefinitionSchema ;
+#  rdfs:range om:Temperature ;
+  rdfs:range xsd:integer ;
+.
+
+nizom:pasteurizationDefinitionUnitOfMeasure
+  a table:InterfaceObjectProperty ;
+  rdfs:domain nizom:PasteurizationDefinitionSchema ;
+  rdfs:range om:Unit ;
+.
+
+nizom:pasteurizationDefinitionOutletTemperatureAmount
+  a table:InterfaceObjectProperty ;
+  rdfs:domain nizom:PasteurizationDefinitionSchema ;
+  rdfs:range om:Temperature ;
+.
+
+nizom:pasteurizationDefinitionOutletTemperatureAmount
+  omx:isQuantityPropertyOf
+    [omx:hasNumericalValueProperty nizom:pd_outletTemperature ;
+     omx:hasUnitProperty nizom:pd_unitOfMeasure]
+.
+
+
+nizom:pd_HEX
+  owl3:dataTypePropertyChain(
+                nizom:pasteurizationDefinitionHEX
+#                skos:prefLabel
+                rdfs:label
+                )
+.
+
+nizom:pd_type
+  owl3:dataTypePropertyChain(
+                nizom:pasteurizationDefinitionType
+#                skos:prefLabel
+                rdfs:label
+                )
+.
+
+nizom:pd_outletTemperature
+  owl3:dataTypePropertyChain(
+                nizom:pasteurizationDefinitionOutletTemperatureAmount
+                om:hasValue                       # synonym omx:hasMeasure
+              om:hasNumericalValue
+             )
+.
+
+nizom:pd_unitOfMeasure
+  owl3:dataTypePropertyChain(
+                nizom:pasteurizationDefinitionOutletTemperatureAmount
+                om:hasValue                      # synonym omx:hasMeasure
+              om:hasUnit
+              rdfs:label                            # beter omx:hasUnitName
+)                            
+.
+
+
+
+nizom:HoldingTubeSchema
+  a table:DataSchemaClass ;
+  table:hasColumnProperty nizom:ht_property,
+                          nizom:ht_value,
+                          nizom:ht_unitOfMeasure
+.
+
+nizom:ht_property                # This column was called 'Holding tube', but I think that is not convenient. The column represents properties of holding tubes.
+  a table:ColumnProperty ;
+  rdfs:domain nizom:HoldingTubeSchema ;
+  rdfs:range xsd:string ;
+  table:hasColumnName "Property" ;
+.
+
+nizom:ht_value
+  a table:ColumnProperty ;
+  rdfs:domain nizom:HoldingTubeSchema ;
+  rdfs:range xsd:integer ;
+  table:hasColumnName "Value" ;
+.
+
+nizom:ht_unitOfMeasure
+  a table:ColumnProperty ;
+  rdfs:domain nizom:HoldingTubeSchema ;
+  rdfs:range xsd:string ;
+  table:hasColumnName "UnitOfMeasure" ;
+.
+
+nizom:holdingTubeProperty
+  a table:InterfaceObjectProperty ;
+  rdfs:domain nizom:HoldingTubeSchema ;
+  rdfs:range om:Quantity ;
+.
+
+nizom:holdingTubeValue
+  a table:InterfaceDatatypeProperty ;
+  rdfs:domain nizom:HoldingTubeSchema ;
+  rdfs:range xsd:integer ;
+.
+
+nizom:holdingTubeUnitOfMeasure
+  a table:InterfaceObjectProperty ;
+  rdfs:domain nizom:HoldingTubeSchema ;
+  rdfs:range om:Unit ;
+.
+
+nizom:holdingTubeAmount
+  a table:InterfaceObjectProperty ;
+  rdfs:domain nizom:HoldingTubeSchema ;
+  rdfs:range om:Quantity ;
+.
+
+nizom:holdingTubeAmount
+  omx:isQuantityPropertyOf
+    [omx:hasNumericalValueProperty nizom:ht_value ;
+     omx:hasUnitProperty nizom:ht_unitOfMeasure]
+.
+
+
+nizom:ht_property
+  owl3:dataTypePropertyChain(
+                nizom:holdingTubeProperty
+#                skos:prefLabel
+                rdfs:label
+                )
+.
+
+nizom:ht_value
+  owl3:dataTypePropertyChain(
+                nizom:holdingTubeAmount 
+                om:hasValue                       # synonym omx:hasMeasure
+              om:hasNumericalValue
+             )
+.
+
+nizom:ht_unitOfMeasure
+  owl3:dataTypePropertyChain(
+                nizom:holdingTubeAmount
+                om:hasValue                      # synonym omx:hasMeasure
+              om:hasUnit
+              rdfs:label                            # beter omx:hasUnitName
+)                            
+.
+
+
+# Temporarily defined in nizom. Should be transferred to OM:
+
+#  <owl:Class rdf:about="&om;LogarithmicVolumetricViableCount">
+#    <rdfs:label xml:lang="en">logarithmic viable count (volumetric)</rdfs:label>
+#    <rdfs:subClassOf rdf:resource="&om;Quantity"/>
+#  </owl:Class>
+#
+#  <owl:Class rdf:about="&om;LogarithmicVolumetricViableCount">
+#    <rdfs:subClassOf>
+#      <owl:Restriction>
+#        <owl:onProperty rdf:resource="&om;hasDimension"/>
+#        <owl:hasValue rdf:resource="&om;dimensionOne"/>
+#      </owl:Restriction>
+#    </rdfs:subClassOf>
+#  </owl:Class>
+#
+#  <owl:Class rdf:about="&om;LogarithmicVolumetricViableCount">
+#    <om:commonlyHasUnit rdf:resource="&om;logarithmicColonyFormingUnitPerMillilitre"/>
+#    <om:commonlyHasUnit rdf:resource="&om;one"/>
+#  </owl:Class>
+#
+#  <om:Unit rdf:about="&om;logarithmicColonyFormingUnitPerMillilitre">
+#    <rdfs:label xml:lang="en">logarithmic colony forming unit per millilitre</rdfs:label>
+#    <om:symbol>log CFU/ml</om:symbol>
+#    <rdf:type rdf:resource="&om;SingularUnit"/>
+#    <om:hasDimension rdf:resource="&om;dimensionOne"/>
+#  </om:Unit>
+#
+#  <owl:Class rdf:about="&om;LogarithmicVolumetricViableCountUnit">
+#    <rdfs:label xml:lang="en">logarithmic volumetric viable count unit</rdfs:label>
+#    <rdfs:subClassOf rdf:resource="&om;Unit"/>
+#    <owl:equivalentClass>
+#      <owl:Class>
+#        <owl:oneOf rdf:parseType="Collection">
+#          <om:Unit rdf:about="&om;logarithmicColonyFormingUnitPerMillilitre"/>
+#          <om:Unit rdf:about="&om;one"/>
+#        </owl:oneOf>
+#      </owl:Class>
+#    </owl:equivalentClass>
+#  </owl:Class>
+#
+#  <owl:Class rdf:about="&om;LogarithmicVolumetricViableCount">
+#    <rdfs:subClassOf>
+#      <owl:Restriction>
+#        <owl:onProperty rdf:resource="&om;hasValue"/>
+#        <owl:allValuesFrom>
+#          <owl:Restriction>
+#            <owl:onProperty rdf:resource="&om;hasUnit"/>
+#            <owl:allValuesFrom>
+#              <owl:Class rdf:about="&om;LogarithmicVolumetricViableCountUnit"/>
+#            </owl:allValuesFrom>
+#          </owl:Restriction>	
+#        </owl:allValuesFrom>
+#      </owl:Restriction>     
+#    </rdfs:subClassOf>     
+#  </owl:Class>
+
+om:LogarithmicVolumetricViableCount
+  rdfs:label "logarithmic viable count (volumetric)"@en ;
+  a owl:Class ;
+  rdfs:subclassOf om:Quantity ;
+.
+
+om:LogarithmicVolumetricViableCount
+  om:commonlyHasUnit om:logarithmicColonyFormingUnitPerMillilitre ;
+  om:commonlyHasUnit om:one ;
+.
+
+om:logarithmicColonyFormingUnitPerMillilitre
+  a om:Unit ;
+  rdfs:label "logarithmic colony forming unit per millilitre"@en ;
+  om:symbol "log CFU/ml" ;
+  a om:SingularUnit ;
+  om:hasDimension om:dimensionOne ;
+.
+
+om:LogarithmicVolumetricViableCountUnit
+  rdfs:label "logarithmic volumetric viable count unit"@en ;
+  a owl:Class ;
+  rdfs:subClassOf om:Unit ;
+  owl:oneOf (om:logarithmicColonyFormingUnitPerMillilitre
+             om:one) ;
+.
+
+om:LogarithmicVolumetricViableCount
+  rdfs:subClassOf
+    [a owl:Restriction ;
+      owl:onProperty om:hasUnit ;
+      owl:toClass om:LogarithmicVolumetricViableCountUnit] ;
+.
+
+
+
+nizom:InitialMicrobialCountSchema      # Ter onderscheid met het MicrobialCountSchema dat het pasteurization model als output geeft en het shelf life model als input gebruikt
+  a table:DataSchemaClass ;
+  table:hasColumnProperty nizom:imc_microbe,
+                          nizom:imc_value,
+                          nizom:imc_unitOfMeasure
+.
+
+nizom:imc_microbe
+  a table:ColumnProperty ;
+  rdfs:domain nizom:InitialMicrobialCountSchema ;
+  rdfs:range xsd:string ;
+  table:hasColumnName "Microbe" ;
+.
+
+nizom:imc_value
+  a table:ColumnProperty ;
+  rdfs:domain nizom:InitialMicrobialCountSchema ;
+  rdfs:range xsd:integer ;
+  table:hasColumnName "Value" ;
+.
+
+nizom:imc_unitOfMeasure
+  a table:ColumnProperty ;
+  rdfs:domain nizom:InitialMicrobialCountSchema ;
+  rdfs:range xsd:string ;
+  table:hasColumnName "UnitOfMeasure" ;
+.
+
+nizom:initialMicrobialCountMicrobe
+  a table:InterfaceObjectProperty ;
+  rdfs:domain nizom:InitialMicrobialCountSchema ;
+  rdfs:range obo:OMIT_0002795 ;            # Class 'Bacteria' in Ontology for MIRNA Target (OMIT)
+.
+
+nizom:initialMicrobialCountValue
+  a table:InterfaceDatatypeProperty ;
+  rdfs:domain nizom:InitialMicrobialCountSchema ;
+  rdfs:range xsd:integer ;
+.
+
+nizom:initialMicrobialCountUnitOfMeasure
+  a table:InterfaceObjectProperty ;
+  rdfs:domain nizom:InitialMicrobialCountSchema ;
+  rdfs:range om:Unit ;
+.
+
+nizom:initialMicrobialCountAmount
+  a table:InterfaceObjectProperty ;
+  rdfs:domain nizom:InitialMicrobialCountSchema ;
+#  rdfs:range om:Quantity ;
+  rdfs:range om:LogarithmicVolumetricViableCount ;
+.
+
+nizom:initialMicrobialCountAmount
+  omx:isQuantityPropertyOf
+    [omx:hasNumericalValueProperty nizom:imc_value ;
+     omx:hasUnitProperty nizom:imc_unitOfMeasure]
+.
+
+
+nizom:imc_microbe
+  owl3:dataTypePropertyChain(
+                nizom:initialMicrobialCountMicrobe
+#                skos:prefLabel
+                rdfs:label            # Wordt gebruikt in OMIT
+                )
+.
+
+nizom:imc_value
+  owl3:dataTypePropertyChain(
+                nizom:initialMicrobialCountAmount 
+                om:hasValue                       # synonym omx:hasMeasure
+              om:hasNumericalValue
+             )
+.
+
+nizom:imc_unitOfMeasure
+  owl3:dataTypePropertyChain(
+                nizom:initialMicrobialCountAmount
+                om:hasValue                      # synonym omx:hasMeasure
+              om:hasUnit
+              rdfs:label                            # beter omx:hasUnitName
+)                            
+.
+
+
+
+nizom:MicrobialCountSchema
+  a table:DataSchemaClass ;
+  table:hasColumnProperty nizom:mc_microbe,
+                          nizom:mc_value,
+                          nizom:mc_unitOfMeasure
+.
+
+nizom:mc_microbe
+  a table:ColumnProperty ;
+  rdfs:domain nizom:MicrobialCountSchema ;
+  rdfs:range xsd:string ;
+  table:hasColumnName "Microbe" ;
+.
+
+nizom:mc_value
+  a table:ColumnProperty ;
+  rdfs:domain nizom:MicrobialCountSchema ;
+  rdfs:range xsd:integer ;
+  table:hasColumnName "Value" ;
+.
+
+nizom:mc_unitOfMeasure
+  a table:ColumnProperty ;
+  rdfs:domain nizom:MicrobialCountSchema ;
+  rdfs:range xsd:string ;
+  table:hasColumnName "UnitOfMeasure" ;
+.
+
+nizom:microbialCountMicrobe
+  a table:InterfaceObjectProperty ;
+  rdfs:domain nizom:MicrobialCountSchema ;
+  rdfs:range obo:OMIT_0002795 ;            # Class 'Bacteria' in Ontology for MIRNA Target (OMIT)
+.
+
+nizom:microbialCountValue
+  a table:InterfaceDatatypeProperty ;
+  rdfs:domain nizom:MicrobialCountSchema ;
+  rdfs:range xsd:integer ;
+.
+
+nizom:microbialCountUnitOfMeasure
+  a table:InterfaceObjectProperty ;
+  rdfs:domain nizom:MicrobialCountSchema ;
+  rdfs:range om:Unit ;
+.
+
+nizom:microbialCountAmount
+  a table:InterfaceObjectProperty ;
+  rdfs:domain nizom:MicrobialCountSchema ;
+#  rdfs:range om:Quantity ;
+  rdfs:range om:LogarithmicVolumetricViableCount ;
+.
+
+nizom:microbialCountAmount
+  omx:isQuantityPropertyOf
+    [omx:hasNumericalValueProperty nizom:mc_value ;
+     omx:hasUnitProperty nizom:mc_unitOfMeasure]
+.
+
+
+nizom:mc_microbe
+  owl3:dataTypePropertyChain(
+                nizom:microbialCountMicrobe
+#                skos:prefLabel
+                rdfs:label            # Wordt gebruikt in OMIT
+                )
+.
+
+nizom:mc_value
+  owl3:dataTypePropertyChain(
+                nizom:microbialCountAmount 
+                om:hasValue                       # synonym omx:hasMeasure
+              om:hasNumericalValue
+             )
+.
+
+nizom:mc_unitOfMeasure
+  owl3:dataTypePropertyChain(
+                nizom:microbialCountAmount
+                om:hasValue                      # synonym omx:hasMeasure
+              om:hasUnit
+              rdfs:label                            # beter omx:hasUnitName
+)                            
+.
+
+
+
+nizom:ShelfConditionsSchema
+  a table:DataSchemaClass ;
+  table:hasColumnProperty nizom:sc_property,
+                          nizom:sc_value,
+                          nizom:sc_unitOfMeasure
+.
+
+nizom:sc_property
+  a table:ColumnProperty ;
+  rdfs:domain nizom:ShelfConditionsSchema ;
+  rdfs:range xsd:string ;
+  table:hasColumnName "Property" ;
+.
+
+nizom:sc_value
+  a table:ColumnProperty ;
+  rdfs:domain nizom:ShelfConditionsSchema ;
+  rdfs:range xsd:integer ;
+  table:hasColumnName "Value" ;
+.
+
+nizom:sc_unitOfMeasure
+  a table:ColumnProperty ;
+  rdfs:domain nizom:ShelfConditionsSchema ;
+  rdfs:range xsd:string ;
+  table:hasColumnName "UnitOfMeasure" ;
+.
+
+nizom:shelfConditionsProperty
+  a table:InterfaceObjectProperty ;
+  rdfs:domain nizom:ShelfConditionsSchema ;
+  rdfs:range om:Quantity ;
+.
+
+nizom:shelfConditionsValue
+  a table:InterfaceDatatypeProperty ;
+  rdfs:domain nizom:ShelfConditionsSchema ;
+  rdfs:range xsd:integer ;
+.
+
+nizom:shelfConditionsUnitOfMeasure
+  a table:InterfaceObjectProperty ;
+  rdfs:domain nizom:ShelfConditionsSchema ;
+  rdfs:range om:Unit ;
+.
+
+nizom:shelfConditionsAmount
+  a table:InterfaceObjectProperty ;
+  rdfs:domain nizom:ShelfConditionsSchema ;
+  rdfs:range om:Quantity ;
+.
+
+nizom:shelfConditionsAmount
+  omx:isQuantityPropertyOf
+    [omx:hasNumericalValueProperty nizom:sc_value ;
+     omx:hasUnitProperty nizom:sc_unitOfMeasure]
+.
+
+
+nizom:sc_property
+  owl3:dataTypePropertyChain(
+                nizom:shelfConditionsProperty
+#                skos:prefLabel
+                rdfs:label
+                )
+.
+
+nizom:sc_value
+  owl3:dataTypePropertyChain(
+                nizom:shelfConditionsAmount 
+                om:hasValue                       # synonym omx:hasMeasure
+              om:hasNumericalValue
+             )
+.
+
+nizom:sc_unitOfMeasure
+  owl3:dataTypePropertyChain(
+                nizom:shelfConditionsAmount
+                om:hasValue                      # synonym omx:hasMeasure
+              om:hasUnit
+              rdfs:label                            # beter omx:hasUnitName
+)                            
+.
+
+
+
+nizom:FinalMicrobialCountSchema      # Ter onderscheid met het MicrobialCountSchema dat het pasteurization model als output geeft en het shelf life model als input gebruikt
+  a table:DataSchemaClass ;
+  table:hasColumnProperty nizom:fmc_microbe,
+                          nizom:fmc_value,
+                          nizom:fmc_unitOfMeasure
+.
+
+nizom:fmc_microbe
+  a table:ColumnProperty ;
+  rdfs:domain nizom:FinalMicrobialCountSchema ;
+  rdfs:range xsd:string ;
+  table:hasColumnName "Microbe" ;
+.
+
+nizom:fmc_value
+  a table:ColumnProperty ;
+  rdfs:domain nizom:FinalMicrobialCountSchema ;
+  rdfs:range xsd:integer ;
+  table:hasColumnName "Value" ;
+.
+
+nizom:fmc_unitOfMeasure
+  a table:ColumnProperty ;
+  rdfs:domain nizom:FinalMicrobialCountSchema ;
+  rdfs:range xsd:string ;
+  table:hasColumnName "UnitOfMeasure" ;
+.
+
+nizom:finalMicrobialCountMicrobe
+  a table:InterfaceObjectProperty ;
+  rdfs:domain nizom:FinalMicrobialCountSchema ;
+  rdfs:range obo:OMIT_0002795 ;            # Class 'Bacteria' in Ontology for MIRNA Target (OMIT)
+.
+
+nizom:finalMicrobialCountValue
+  a table:InterfaceDatatypeProperty ;
+  rdfs:domain nizom:FinalMicrobialCountSchema ;
+  rdfs:range xsd:integer ;
+.
+
+nizom:finalMicrobialCountUnitOfMeasure
+  a table:InterfaceObjectProperty ;
+  rdfs:domain nizom:FinalMicrobialCountSchema ;
+  rdfs:range om:Unit ;
+.
+
+nizom:finalMicrobialCountAmount
+  a table:InterfaceObjectProperty ;
+  rdfs:domain nizom:FinalMicrobialCountSchema ;
+#  rdfs:range om:Quantity ;
+  rdfs:range om:LogarithmicVolumetricViableCount ;
+.
+
+nizom:finalMicrobialCountAmount
+  omx:isQuantityPropertyOf
+    [omx:hasNumericalValueProperty nizom:fmc_value ;
+     omx:hasUnitProperty nizom:fmc_unitOfMeasure]
+.
+
+
+nizom:fmc_microbe
+  owl3:dataTypePropertyChain(
+                nizom:finalMicrobialCountMicrobe
+#                skos:prefLabel
+                rdfs:label            # Wordt gebruikt in OMIT
+                )
+.
+
+nizom:fmc_value
+  owl3:dataTypePropertyChain(
+                nizom:finalMicrobialCountAmount 
+                om:hasValue                       # synonym omx:hasMeasure
+              om:hasNumericalValue
+             )
+.
+
+nizom:fmc_unitOfMeasure
+  owl3:dataTypePropertyChain(
+                nizom:finalMicrobialCountAmount
+                om:hasValue                      # synonym omx:hasMeasure
+              om:hasUnit
+              rdfs:label                            # beter omx:hasUnitName
+)                            
+.
+
+
+
+nizom:argument__product_stream_definition_schema
+  a service:Argument ;
+  service:hasArgumentName "product_stream_definition_schema" ;
+  service:hasArgumentSchema nizom:ProductStreamDefinitionSchema ;
+.
+
+nizom:argument__pasteurization_definition_schema
+  a service:Argument ;
+  service:hasArgumentName "pasteurization_definition_schema" ;
+  service:hasArgumentSchema nizom:PasteurizationDefinitionSchema ;
+.
+
+nizom:argument__holding_tube_schema
+  a service:Argument ;
+  service:hasArgumentName "holding_tube_schema" ;
+  service:hasArgumentSchema nizom:HoldingTubeSchema ;
+.
+
+nizom:argument__initial_microbial_count_schema
+  a service:Argument ;
+  service:hasArgumentName "initial_microbial_count_schema" ;
+  service:hasArgumentSchema nizom:InitialMicrobialCountSchema ;
+.
+
+nizom:argument__microbial_count_schema
+  a service:Argument ;
+  service:hasArgumentName "microbial_count_schema" ;
+  service:hasArgumentSchema nizom:MicrobialCountSchema ;
+.
+
+nizom:argument__shelf_conditions_schema
+  a service:Argument ;
+  service:hasArgumentName "shelf_conditions_schema" ;
+  service:hasArgumentSchema nizom:ShelfConditionsSchema ;
+.
+
+nizom:argument__final_microbial_count_schema
+  a service:Argument ;
+  service:hasArgumentName "final_microbial_count_schema" ;
+  service:hasArgumentSchema nizom:FinalMicrobialCountSchema ;
+.
+
+nizom:PasteurizationModel
+  a service:Service ;
+  service:hasInputArgument nizom:argument__product_stream_definition_schema, nizom:argument__pasteurization_definition_schema, nizom:argument__holding_tube_schema, nizom:argument__initial_microbial_count_schema ;
+  service:hasOutputArgument nizom:argument__microbial_count_schema ;
+.
+
+nizom:ShelfLifeModel
+  a service:Service ;
+  service:hasInputArgument nizom:argument__product_stream_definition_schema, nizom:argument__shelf_conditions_schema, nizom:argument__microbial_count_schema ;
+  service:hasOutputArgument nizom:argument__final_microbial_count_schema ;
+.
+
+
+

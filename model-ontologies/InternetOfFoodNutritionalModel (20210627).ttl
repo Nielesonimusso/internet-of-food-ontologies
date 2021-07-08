@@ -1,0 +1,419 @@
+@prefix : <http://www.foodvoc.org/resource/InternetOfFood/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix inof: <http://www.foodvoc.org/resource/InternetOfFood/> .
+@prefix table: <http://www.foodvoc.org/resource/InternetOfFood/Table> .
+@prefix service: <http://www.foodvoc.org/resource/InternetOfFood/Service> .
+
+@prefix nm: <http://www.foodvoc.org/resource/InternetOfFood/NutritionalModel> .
+
+
+@prefix om: <http://www.ontology-of-units-of-measure.org/resource/om-2/> .
+@prefix omx: <http://www.foodvoc.org/resource/InternetOfFood/> .     # OM extension
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix owl2: <http://www.w3.org/2006/12/owl2#> .
+@prefix owl3: <http://www.foodvoc.org/resource/InternetOfFood/> .    # Imaginary Owl version (does not exist)
+@prefix prov: <http://www.w3.org/ns/prov/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix foodon: <http://purl.org/heals/foodon/> .
+
+# Change http adresses of inof:, table:, service:, and tmfts: to urn's? If so, use rdfs:isDefinedBy.
+
+nm:
+  a owl:Ontology ;
+#  rdfs:isDefinedBy
+#    <http://www.w3.org/TR/owl2-mapping-to-rdf/>,      # Voorbeeld; uit de ontologie van Owl zelf.
+#    <http://www.w3.org/TR/owl2-rdf-based-semantics/>, # Voorbeeld; uit de ontologie van Owl zelf.
+#    <http://www.w3.org/TR/owl2-syntax/> ;             # Voorbeeld; uit de ontologie van Owl zelf.
+  owl:imports <http://www.w3.org/2004/02/skos/core> ;
+# De andere ontologieën die we met de prefixes aangeven ook importeren? Dit zouden dan wel echt http's zijn.
+.
+
+# Nutritional Model (nm)
+
+nm:IngredientSchema
+  a table:DataSchemaClass ;
+  table:hasColumnProperty nm:ing_ingredient, 
+                          nm:ing_ingredientCode,
+                          nm:ing_value,
+                          nm:ing_unitOfMeasure
+.
+
+nm:ing_ingredient
+  a table:ColumnProperty ;
+  rdfs:domain nm:IngredientSchema ;
+  rdfs:range xsd:string ;
+  table:hasColumnName "Ingredient" ;
+.
+
+nm:ing_ingredientCode
+  a table:ColumnProperty ;
+  rdfs:domain nm:IngredientSchema ;
+  rdfs:range xsd:integer ;
+  table:hasColumnName "IngredientCode" ;
+.
+
+nm:ing_value
+  a table:ColumnProperty ;
+  rdfs:domain nm:IngredientSchema ;
+  rdfs:range xsd:integer ;
+  table:hasColumnName "Value" ;
+.
+
+nm:ing_unitOfMeasure
+  a table:ColumnProperty ;
+  rdfs:domain nm:IngredientSchema ;
+  rdfs:range xsd:string ;
+  table:hasColumnName "UnitOfMeasure" ;
+.
+
+
+nm:ingredient
+  a table:InterfaceObjectProperty ;
+  rdfs:domain nm:IngredientSchema ;
+  rdfs:range foodon:FoodMaterial ;
+.
+
+nm:ingredientValue
+  a table:InterfaceDatatypeProperty ;
+  rdfs:domain nm:IngredientSchema ;
+  rdfs:range xsd:integer ;
+.
+
+nm:ingredientUnitOfMeasure
+  a table:InterfaceObjectProperty ;
+  rdfs:domain nm:IngredientSchema ;
+  rdfs:range om:Unit ;
+.
+
+nm:ingredientAmount
+  a table:InterfaceObjectProperty ;
+  rdfs:domain nm:IngredientSchema ;
+  rdfs:range om:Quantity ;
+.
+
+nm:ingredientAmount
+  omx:isQuantityPropertyOf
+    [omx:hasNumericalValueProperty nm:ing_value ;
+     omx:hasUnitProperty nm:ing_unitOfMeasure]
+.
+
+
+nm:ing_ingredient
+  owl3:dataTypePropertyChain(
+                nm:ingredient
+#                skos:prefLabel
+                rdfs:Label       # FoodOn uses rdfs:label, not skos:prefLabel
+                )
+.
+
+nm:ing_value
+  owl3:dataTypePropertyChain(
+                nm:ingredientAmount 
+                om:hasValue                       # synonym omx:hasMeasure
+              om:hasNumericalValue
+             )
+.
+
+nm:ing_unitOfMeasure
+  owl3:dataTypePropertyChain(
+                nm:ingredientAmount
+                om:hasValue                      # synonym omx:hasMeasure
+              om:hasUnit
+              rdfs:label                            # beter omx:hasUnitName
+)                            
+.
+
+
+
+nm:ProductDosageSchema
+  a table:DataSchemaClass ;
+  table:hasColumnProperty nm:dos_productDosage,    # Dit heb ik er maar even van gemaakt.
+                          nm:dos_value,
+                          nm:dos_unitOfMeasure
+.
+
+nm:dos_productDosage
+  a table:ColumnProperty ;
+  rdfs:domain nm:ProductDosageSchema ;
+  rdfs:range xsd:string ;
+  table:hasColumnName "ProductDosage" ;
+.
+
+nm:dos_value
+  a table:ColumnProperty ;
+  rdfs:domain nm:ProductDosageSchema ;
+  rdfs:range xsd:integer ;
+  table:hasColumnName "Value" ;
+.
+
+nm:dos_unitOfMeasure
+  a table:ColumnProperty ;
+  rdfs:domain nm:ProductDosageSchema ;
+  rdfs:range xsd:string ;
+  table:hasColumnName "UnitOfMeasure" ;
+.
+
+nm:productDosage
+  a table:InterfaceObjectProperty ;
+  rdfs:domain nm:ProductDosageSchema ;
+  rdfs:range om:Density ;
+.
+
+nm:productDosageValue
+  a table:InterfaceDatatypeProperty ;
+  rdfs:domain nm:ProductDosageSchema ;
+  rdfs:range xsd:integer ;
+.
+
+nm:productDosageUnitOfMeasure
+  a table:InterfaceObjectProperty ;
+  rdfs:domain nm:ProductDosageSchema ;
+  rdfs:range om:Unit ;
+.
+
+nm:productDosageAmount
+  a table:InterfaceObjectProperty ;
+  rdfs:domain nm:ProductDosageSchema ;
+  rdfs:range om:Quantity ;
+.
+
+nm:productDosageAmount
+  omx:isQuantityPropertyOf
+    [omx:hasNumericalValueProperty nm:dos_value ;
+     omx:hasUnitProperty nm:dos_unitOfMeasure]
+.
+
+
+nm:dos_productDosage
+  owl3:dataTypePropertyChain(
+                nm:productDosage
+#                skos:prefLabel
+                rdfs:label
+                )
+.
+
+nm:dos_value
+  owl3:dataTypePropertyChain(
+                nm:productDosageAmount 
+                om:hasValue                       # synonym omx:hasMeasure
+              om:hasNumericalValue
+             )
+.
+
+nm:dos_unitOfMeasure
+  owl3:dataTypePropertyChain(
+                nm:productDosageAmount
+                om:hasValue                      # synonym omx:hasMeasure
+              om:hasUnit
+              rdfs:label                            # beter omx:hasUnitName
+)                            
+.
+
+
+
+nm:NutrientValuesPureProductsSchema
+  a table:DataSchemaClass ;
+  table:hasColumnProperty nm:nvpp_property,
+                          nm:nvpp_value,
+                          nm:nvpp_unitOfMeasure
+.
+
+nm:nvpp_property
+  a table:ColumnProperty ;
+  rdfs:domain nm:NutrientValuesPureProductsSchema ;
+  rdfs:range xsd:string ;
+  table:hasColumnName "Property" ;
+.
+
+nm:nvpp_value
+  a table:ColumnProperty ;
+  rdfs:domain nm:NutrientValuesPureProductsSchema ;
+  rdfs:range xsd:integer ;
+  table:hasColumnName "Value" ;
+.
+
+nm:nvpp_unitOfMeasure
+  a table:ColumnProperty ;
+  rdfs:domain nm:NutrientValuesPureProductsSchema ;
+  rdfs:range xsd:string ;
+  table:hasColumnName "UnitOfMeasure" ;
+.
+
+nm:nutrientValuesPureProductsProperty
+  a table:InterfaceObjectProperty ;
+  rdfs:domain nm:NutrientValuesPureProductsSchema ;
+  rdfs:range om:Quantity ;
+.
+
+nm:nutrientValuesPureProductsValue
+  a table:InterfaceDatatypeProperty ;
+  rdfs:domain nm:NutrientValuesPureProductsSchema ;
+  rdfs:range xsd:integer ;
+.
+
+nm:nutrientValuesPureProductsUnitOfMeasure
+  a table:InterfaceObjectProperty ;
+  rdfs:domain nm:NutrientValuesPureProductsSchema ;
+  rdfs:range om:Unit ;
+.
+
+nm:nutrientValuesPureProductsAmount
+  a table:InterfaceObjectProperty ;
+  rdfs:domain nm:NutrientValuesPureProductsSchema ;
+  rdfs:range om:Quantity ;
+.
+
+nm:nutrientValuesPureProductsAmount
+  omx:isQuantityPropertyOf
+    [omx:hasNumericalValueProperty nm:nvpp_value ;
+     omx:hasUnitProperty nm:nvpp_unitOfMeasure]
+.
+
+
+nm:nvpp_property
+  owl3:dataTypePropertyChain(
+                nm:nutrientValuesPureProductsProperty
+#                skos:prefLabel
+                rdfs:label
+                )
+.
+
+nm:nvpp_value
+  owl3:dataTypePropertyChain(
+                nm:nutrientValuesPureProductsAmount 
+                om:hasValue                       # synonym omx:hasMeasure
+              om:hasNumericalValue
+             )
+.
+
+nm:nvpp_unitOfMeasure
+  owl3:dataTypePropertyChain(
+                nm:nutrientValuesPureProductsAmount
+                om:hasValue                      # synonym omx:hasMeasure
+              om:hasUnit
+              rdfs:label                            # beter omx:hasUnitName
+)                            
+.
+
+
+
+nm:NutrientValues1ProductSchema               # the portion size is included in this table
+  a table:DataSchemaClass ;
+  table:hasColumnProperty nm:nv1p_property,
+                          nm:nv1p_value,
+                          nm:nv1p_unitOfMeasure
+.
+
+nm:nv1p_property
+  a table:ColumnProperty ;
+  rdfs:domain nm:NutrientValues1ProductSchema ;
+  rdfs:range xsd:string ;
+  table:hasColumnName "Property" ;
+.
+
+nm:nv1p_value
+  a table:ColumnProperty ;
+  rdfs:domain nm:NutrientValues1ProductSchema ;
+  rdfs:range xsd:integer ;
+  table:hasColumnName "Value" ;
+.
+
+nm:nv1p_unitOfMeasure
+  a table:ColumnProperty ;
+  rdfs:domain nm:NutrientValues1ProductSchema ;
+  rdfs:range xsd:string ;
+  table:hasColumnName "UnitOfMeasure" ;
+.
+
+nm:nutrientValues1ProductProperty
+  a table:InterfaceObjectProperty ;
+  rdfs:domain nm:NutrientValues1ProductSchema ;
+  rdfs:range om:Quantity ;
+.
+
+nm:nutrientValues1ProductValue
+  a table:InterfaceDatatypeProperty ;
+  rdfs:domain nm:NutrientValues1ProductSchema ;
+  rdfs:range xsd:integer ;
+.
+
+nm:nutrientValues1ProductUnitOfMeasure
+  a table:InterfaceObjectProperty ;
+  rdfs:domain nm:NutrientValues1ProductSchema ;
+  rdfs:range om:Unit ;
+.
+
+nm:nutrientValues1ProductAmount
+  a table:InterfaceObjectProperty ;
+  rdfs:domain nm:NutrientValues1ProductSchema ;
+  rdfs:range om:Quantity ;
+.
+
+nm:nutrientValues1ProductAmount
+  omx:isQuantityPropertyOf
+    [omx:hasNumericalValueProperty nm:nv1p_value ;
+     omx:hasUnitProperty nm:nv1p_unitOfMeasure]
+.
+
+
+nm:nv1p_property
+  owl3:dataTypePropertyChain(
+                nm:nutrientValues1ProductProperty
+#                skos:prefLabel
+                rdfs:label
+                )
+.
+
+nm:nv1p_value
+  owl3:dataTypePropertyChain(
+                nm:nutrientValues1ProductAmount 
+                om:hasValue                       # synonym omx:hasMeasure
+              om:hasNumericalValue
+             )
+.
+
+nm:nv1p_unitOfMeasure
+  owl3:dataTypePropertyChain(
+                nm:nutrientValues1ProductAmount
+                om:hasValue                      # synonym omx:hasMeasure
+              om:hasUnit
+              rdfs:label                            # beter omx:hasUnitName
+)                            
+.
+
+
+nm:argument__ingredient_schema
+  a service:Argument ;
+  service:hasArgumentName "ingredient_schema" ;
+  service:hasArgumentSchema nm:IngredientSchema ;
+.
+
+nm:argument__product_dosage_schema
+  a service:Argument ;
+  service:hasArgumentName "product_dosage_schema" ;
+  service:hasArgumentSchema nm:ProductDosageSchema ;
+.
+
+nm:argument__nutrient_values_pure_products_schema
+  a service:Argument ;
+  service:hasArgumentName "nutrient_values_pure_products_schema" ;
+  service:hasArgumentSchema nm:NutrientValuesPureProductsSchema ;
+.
+
+nm:argument__nutrient_values_1_product_schema
+  a service:Argument ;
+  service:hasArgumentName "nutrient_values_1_product_schema" ;
+  service:hasArgumentSchema nm:NutrientValues1ProductSchema ;
+.
+
+nm:NutritionCalculator
+  a service:Service ;
+  service:hasInputArgument nm:argument__ingredient_schema, nm:argument__product_dosage_schema ;
+  service:hasOutputArgument nm:argument__nutrient_values_pure_products_schema, nm:argument__nutrient_values_1_product_schema ;
+.
+
+
+
