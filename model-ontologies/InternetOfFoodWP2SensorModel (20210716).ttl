@@ -29,7 +29,7 @@ wp2sm:
 #    <http://www.w3.org/TR/owl2-rdf-based-semantics/>, # Voorbeeld; uit de ontologie van Owl zelf.
 #    <http://www.w3.org/TR/owl2-syntax/> ;             # Voorbeeld; uit de ontologie van Owl zelf.
   owl:imports <http://www.w3.org/2004/02/skos/core> ;
-# De andere ontologieën die we met de prefixes aangeven ook importeren? Dit zouden dan wel echt http's zijn.
+# De andere ontologieÃ«n die we met de prefixes aangeven ook importeren? Dit zouden dan wel echt http's zijn.
 .
 
 # WP2 Sensor Model (wp2sm)
@@ -39,9 +39,10 @@ wp2sm:
 #xxx:ElectroMagneticRadiation a om:PhysicalPhenomenon;
 wp2sm:ElectroMagneticRadiation a om:Phenomenon;
 #	om:hasCharacteristic xxx:wavelength;
-	wp2sm:hasCharacteristic om:Wavelength;
+	wp2sm:hasCharacteristic om:Wavelength; #RB: this ought to have a better property than wps2sm:hasCharacteristic
 	dcterms:description 
-"Electromagnetic radiation is a wave phenomenon caused by varying electric and magnetic fields propagating with the speed of light (in vacuum). EM radiation of different wavelength encompasses phenomena such as radiowaves, microwaves, infrared, ultra violet, X-rays, and gamma radiation" ;
+"Electromagnetic radiation is a wave phenomenon caused by varying electric and magnetic fields propagating with the speed of light (in vacuum).
+ EM radiation of different wavelength encompasses phenomena such as radiowaves, microwaves, infrared, ultra violet, X-rays, and gamma radiation" ;
 	rdfs:label "EM radiation".
 
 wp2sm:InfraRedLight rdfs:subClassOf wp2sm:ElectronMagneticRadiation;
@@ -83,14 +84,14 @@ om:LogarithmicAttenuation
 
 
 
-om:LogarithmicLength
+om:LogarithmicLength                   #RB: Where does this come from ?  The calibration model uses something like log(d/d_geomean) but that really is a NUMBER. 
   rdfs:label "logarithmic length"@en ;
   a owl:Class ;
   rdfs:subclassOf om:Quantity ;
 .
 
 om:LogarithmicLength
-  om:commonlyHasUnit om:decibel ;
+  om:commonlyHasUnit om:decibel ;      #RB: and even though it is much like Log attenuation I would not use decibel. 
   om:commonlyHasUnit om:one ;
 .
 
@@ -112,18 +113,18 @@ om:LogarithmicLength
 
 
 
-om:LogarithmicAttenuationPerLogarithmicLength
+om:LogarithmicAttenuationPerLogarithmicLength                 #RB: this really should not be in om: 
   rdfs:label "logarithmic attenuation per logarithmic length"@en ;
   a owl:Class ;
   rdfs:subclassOf om:Quantity ;
 .
 
-om:LogarithmicAttenuationPerLogarithmicLength
+om:LogarithmicAttenuationPerLogarithmicLength                #RB: this really should not be in om:
   om:commonlyHasUnit om:decibelPerDecibel ;
   om:commonlyHasUnit om:one ;
 .
 
-om:decibelPerDecibel
+om:decibelPerDecibel                             #RB: this really should not be in om:
   a om:UnitDivision ;
   rdfs:label "decibel per decibel"@en ;
   om:symbol "dB/dB" ;
@@ -132,7 +133,7 @@ om:decibelPerDecibel
   om:hasDimension om:dimensionOne ;
 .
 
-om:LogarithmicAttenuationPerLogarithmicLengthUnit
+om:LogarithmicAttenuationPerLogarithmicLengthUnit           #RB: This really should not be in om:
   rdfs:label "logarithmic attenuation per logarithmic length unit"@en ;
   a owl:Class ;
   rdfs:subClassOf om:Unit ;
@@ -144,7 +145,8 @@ om:LogarithmicAttenuation
   rdfs:subClassOf
     [a owl:Restriction ;
       owl:onProperty om:hasUnit ;
-      owl:toClass om:LogarithmicAttenuationPerLogarithmicLengthUnit] ;
+#      owl:toClass om:LogarithmicAttenuationPerLogarithmicLengthUnit] ; #RB: THis is wrong. Should be below:
+      owl:toClass om:LogarithmicAttenuationUnit] ;
 .
 
 
@@ -159,7 +161,7 @@ wp2sm:calibration_dropletSize
   a table:ColumnProperty ;
   rdfs:domain wp2sm:CalibrationSchema;
   rdfs:range xsd:double;
-  table:hasColumnName "Droplet size (µm)".
+  table:hasColumnName "Droplet size (Âµm)". #RB: Do we want to allow non ascii here? it sure looks nice but does it play nicely with Pandas or R. @Niels???
 
 wp2sm:calibration_wavelength
 #  a table:ColumnProperty, owl:DatatypeProperty, owl:FunctionalProperty;
@@ -203,9 +205,8 @@ wp2sm:calibrationLog10Attenuation
   rdfs:range om:LogarithmicAttenuation;
   omx:isQuantityPropertyOf 
     [omx:hasNumericalValueProperty wp2sm:calibration_Log10Attenuation;
-     omx:hasFixedUnit om:db].
-
-
+#     omx:hasFixedUnit om:db]. #RB: lets use decibel here
+     omx:hasFixedUnit om:decibel].				   
 
 wp2sm:AttenuationCurveCoefficientsSchema a table:DataSchemaClass;
 	table:hasColumnProperty wp2sm:accoeff_wavelength,
@@ -241,7 +242,7 @@ wp2sm:accoeff_stddev_beta
 	rdfs:range xsd:double;
 	table:hasColumnName "stddev_beta".
 
-wp2sm:accoeffWavelengh
+wp2sm:accoeffWavelength
 #  a table:InterfaceProperty, owl:ObjectProperty, owl:FunctionalProperty;
   a table:InterfaceProperty ;
 	rdfs:domain wp2sm:AttenuationCurveCoefficients;;
@@ -257,7 +258,7 @@ wp2sm:accoeffAlpha
 	rdfs:range om:LogartithmicAttenuation ;
 	omx:isQuantityPropertyOf 
 		[omx:hasNumericalValueProperty wp2sm:accoeff_alpha;
-		 omx:hasFixedUnit om:decibel]. #XXXXXX!!!!
+		 omx:hasFixedUnit om:decibel]. #RB: this is the correct unit
 
 wp2sm:accoeffBeta
 #  a table:ColumnProperty, owl:ObjectProperty, owl:FunctionalProperty;
@@ -266,8 +267,10 @@ wp2sm:accoeffBeta
 #  rdfs:range om:Log10AttenuationPerWavelength. # Should this be om:LogarithmicAttenuationPerLogarithmicLength? That's the one defined above, not om:Log10AttenuationPerWavelength.
   rdfs:range om:LogarithmicAttenuationPerLogarithmicLength ;
 	omx:isQuantityPropertyOf 
-		[omx:hasNumericalValueProperty wp2sm:accoeff_alpha;
-		 omx:hasFixedUnit om:decibelPerdecibel]. #XXXXXX!!!!
+#		[omx:hasNumericalValueProperty wp2sm:accoeff_alpha; #RB: obviously wrong
+		[omx:hasNumericalValueProperty wp2sm:accoeff_beta;
+#		 omx:hasFixedUnit om:decibelPerdecibel]. #RB: Mmm I can see the point but I think decibel is better: that log(d/d_geom) really is dimensionless
+		 omx:hasFixedUnit om:decibel]
 
 wp2sm:accoeffStdDevBeta
 #  a table:ColumnProperty, owl:ObjectProperty, owl:FunctionalProperty;
@@ -276,10 +279,10 @@ wp2sm:accoeffStdDevBeta
 #  rdfs:range om:Log10AttenuationPerWavelength. # Should this be om:LogarithmicAttenuationPerLogarithmicLength? That's the one defined above, not om:Log10AttenuationPerWavelength.
   rdfs:range om:LogarithmicAttenuationPerLogarithmicLength ;
 	omx:isQuantityPropertyOf 
-		[omx:hasNumericalValueProperty wp2sm:accoeff_alpha;
-		 omx:hasFixedUnit om:decibelPerdecibel].
-
-
+#		[omx:hasNumericalValueProperty wp2sm:accoeff_alpha; #RB:  Obviously wrong
+                [omx:hasNumericalValueProperty wp2sm:accoeff_std_dev_beta;
+#		 omx:hasFixedUnit om:decibelPerdecibel]. #RB: Mmm I can see the point but I think decibel is better: that log(d/d_geom) really is dimensionless
+		 omx:hasFixedUnit om:decibel]
 
 wp2sm:DropSizeSchema a table:DataSchemaClass;
 	table:hasColumnProperty wp2sm:dropsize_dropSize.
@@ -289,7 +292,7 @@ wp2sm:dropsize_dropSize
   a table:ColumnProperty ;
 	rdfs:domain wp2sm:DropSizeSchema;
 	rdfs:range xsd:double;
-	table:hasColumnName "Droplet size (µm)".
+	table:hasColumnName "Droplet size (Âµm)".
  
 wp2sm:dropsizeDropSize
 #  a table:InterfaceProperty, owl:ObjectProperty, owl:FunctionalProperty;
@@ -302,7 +305,6 @@ wp2sm:dropsizeDropSize
 		 omx:hasFixedUnit om:micrometre].
 
 
-
 wp2sm:dropsizeCalibrationModel
 #  a service:Model;
   a service:Service;
@@ -310,7 +312,11 @@ wp2sm:dropsizeCalibrationModel
 	service:hasOutputArgument wp2sm:argument_AttenuationCurveCoeffcients,
 			          wp2sm:argument_GeometricMeanDropsize;
 	dcterms:description 
-"service that computes the attenuation curve coefficients over a range of Near InfraRed wavelengths, from the Mie attenuation curve(s) of log10 attenuation vs wavelength for different droplet sizes For the Drops-R-US XYZ123456 NIR spectrometre see Rogier Brussee (2021): From NIR spectrometry to particle size V2. Rick Sanchez C-137 (2121), the Drops-R-US XYZ123456 NIR spectrometre, Adult Swim".
+"service that computes the attenuation curve coefficients over a range of Near InfraRed wavelengths, 
+ from the Mie attenuation curve(s) of log10 attenuation vs wavelength for different droplet sizes.
+ For the Drops-R-US XYZ123456 NIR spectrometre see 
+ Rogier Brussee (2021): From NIR spectrometry to particle size V2.
+ Rick Sanchez C-137 (2121), the Drops-R-US XYZ123456 NIR spectrometre, Adult Swim".
 
 #wp2sm:input_CalibrationData a service:Argument;
 wp2sm:argument_CalibrationData a service:Argument;
@@ -326,8 +332,6 @@ wp2sm:argument_AttenuationCurveCoeffcients a service:Argument;
 wp2sm:argument_GeometricMeanDropSize a service:Argument;
 	service:hasArgumentName "geometric_mean_droplet_size_micron";
 	service:hasArgumentSchema wp2sm:DropSizeSchema.
-
-
 
 wp2sm:MeasurementSchema a table:DataSchemaClass ;
   table:hasColumnProperty 
@@ -365,8 +369,6 @@ wp2sm:measurementLog10Attenuation
 	omx:isQuantityPropertyOf 
 		[omx:hasNumericalValueProperty wp2sm:measurement_log10Attenuation;
 		 omx:hasFixedUnit om:decibel].
-
-
 
 wp2sm:dropsizeMeasurementModel
 #  a service:Model;
